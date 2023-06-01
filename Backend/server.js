@@ -3,10 +3,17 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
 const { logger } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 const corsOptions = require("./config/corsOptions");
+const connectDB = require("./config/dbConn");
+
+console.log(process.env.NODE_ENV);
+
+connectDB();
 
 const PORT = process.env.PORT || 4500;
 
@@ -17,14 +24,14 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-app.use(corsOptions);
+app.use(cors(corsOptions));
 
 //serve static files
 app.use(express.static("public"));
 
 app.use("/", require("./routes/root"));
 
-// error page routes
+// error page routes/ catch all routes
 app.all("*", (req, res) => {
   res.status(404);
   if (req.accepts("html")) {
@@ -37,4 +44,8 @@ app.all("*", (req, res) => {
 });
 
 app.use(errorHandler);
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+mongoose.connection.once("open", () => {
+  console.log("MongoDB connected successfully");
+  app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+});
