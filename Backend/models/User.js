@@ -6,20 +6,20 @@ const userSchema = new Schema({
     type: String,
     require: true,
   },
-  roles: {
-    User: {
-      type: Number,
-      default: 4000,
-    },
-    Employees: Number,
-    Manager: Number,
-    Admin: Number,
-  },
   password: {
     type: String,
     require: true,
   },
-  refreshToken: String,
+  roles: [
+    {
+      type: String,
+      default: "Employee",
+    },
+  ],
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
