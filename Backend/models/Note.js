@@ -5,16 +5,16 @@ const noteSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true,
+      required: true,
       ref: "User",
     },
     title: {
       type: String,
-      require: true,
+      required: true,
     },
     text: {
       type: String,
-      require: true,
+      required: true,
     },
     completed: {
       type: Boolean,
@@ -32,4 +32,4 @@ noteSchema.plugin(AutoIncrement, {
   start_seq: 500,
 });
 
-module.exports = mongoose.model("Notes", noteSchema);
+module.exports = mongoose.model("Note", noteSchema);

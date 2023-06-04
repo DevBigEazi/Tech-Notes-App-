@@ -31,6 +31,7 @@ app.use(express.static("public"));
 
 app.use("/", require("./routes/root"));
 app.use("/user", require("./routes/userRoute"));
+app.use("/note", require("./routes/noteRoute"));
 
 // error page routes/ catch all routes
 app.all("*", (req, res) => {
