@@ -15,7 +15,7 @@ console.log(process.env.NODE_ENV);
 
 connectDB();
 
-const PORT = process.env.PORT || 8500;
+const PORT = process.env.PORT || 4500;
 
 app.use(logger);
 
@@ -30,8 +30,8 @@ app.use(cors(corsOptions));
 app.use(express.static("public"));
 
 app.use("/", require("./routes/root"));
-app.use("/user", require("./routes/userRoute"));
-app.use("/note", require("./routes/noteRoute"));
+app.use("/users", require("./routes/userRoute"));
+app.use("/notes", require("./routes/noteRoute"));
 
 // error page routes/ catch all routes
 app.all("*", (req, res) => {
