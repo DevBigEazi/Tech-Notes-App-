@@ -72,7 +72,6 @@ const EditUserForm = ({ user }) => {
   const options = Object.values(ROLES).map((role) => {
     return (
       <option key={role} value={role}>
-        {" "}
         {role}
       </option>
     );
@@ -169,7 +168,7 @@ const EditUserForm = ({ user }) => {
           id="roles"
           name="roles"
           className={`form__select ${validRolesClass}`}
-          multiple={true}
+          multiple="multiple"
           size="3"
           value={roles}
           onChange={onRolesChanged}

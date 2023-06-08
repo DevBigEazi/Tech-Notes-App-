@@ -8,43 +8,63 @@ const getAllNotes = asyncHandler(async (req, res) => {
   if (!notes?.length)
     return res.status(400).json({ message: "No notes found" });
 
-  // Add username to each note before sending the response
-  // We want to use Promise.all with map()
-  // We could also do this with a for...of loop
-
-  const notesWithUser = await Promise.all(
-    notes.map(async (note) => {
-      const user = User.findById(note.user).lean().exec();
-      return { ...note, username: user.username };
-    })
-  );
-  res.json(notesWithUser);
+  try {
+    const notesWithUser = await Promise.all(
+      notes.map(async (note) => {
+        const user = await User.findById(note.user).lean().exec();
+        if (user && user.username) {
+          return { ...note, username: user.username };
+        } else {
+          // Handle the case where the user is not found or doesn't have a username
+          return { ...note, username: "Unknown" };
+        }
+      })
+    );
+    res.json(notesWithUser);
+  } catch (error) {
+    // Handle any errors that occur during the database query
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 // to create a new notes, we need to make post request, the route is gonna be /note and must be private
-const createNewNote = asyncHandler(async (req, res) => {
-  const { user, title, text } = req.body;
+const createNewNote = async (req, res) => {
+  try {
+    const { user, title, text } = req.body;
 
-  // Confirm data
-  if (!user || !title || !text) {
-    return res.status(400).json({ message: "All fields are required" });
+    // Confirm data
+    if (!user || !title || !text) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check for duplicate title
+    const duplicateNote = await Note.findOne({ title });
+    if (duplicateNote) {
+      return res.status(409).json({ message: "Duplicate note title" });
+    }
+
+    // Create the new note
+    const newNote = new Note({
+      user,
+      title,
+      text,
+    });
+    const savedNote = await newNote.save();
+
+    if (savedNote) {
+      return res
+        .status(201)
+        .json({ message: "New note added successfully", note: savedNote });
+    } else {
+      return res.status(500).json({ message: "Failed to save note" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while creating the note" });
   }
-
-  // Check for duplicate title
-  const duplicate = await Note.findOne({ title }).lean().exec();
-
-  if (duplicate) {
-    return res.status(409).json({ message: "Duplicate note title" });
-  }
-
-  // Create and store the new user
-  const note = await Note.create({ user, title, text });
-
-  //create
-  if (note)
-    return res.status(201).json({ message: `New note added successfully` });
-  else return res.status(400).json({ message: "Invalid user data received" });
-});
+};
 
 // to update a note, we need to make patch request, the route is gonna be /note and must be private
 const updateNote = asyncHandler(async (req, res) => {

@@ -9,6 +9,7 @@ import {
   EditUser,
   NewNoteForm,
   NewUserForm,
+  Prefetch,
 } from "./features/index";
 
 function App() {
@@ -19,17 +20,19 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Protected Routes */}
-        <Route path="/dash/" element={<DashLayout />}>
-          <Route index element={<Welcome />} />
-          <Route path="users">
-            <Route index element={<UsersList />} />
-            <Route path=":id" element={<EditUser />} />
-            <Route path="newUser" element={<NewUserForm />} />
-          </Route>
-          <Route path="notes/">
-            <Route index element={<NotesList />} />
-            <Route path="newNote" element={<NewNoteForm />} />
-            <Route path=":id" element={<EditNote />} />
+        <Route element={<Prefetch />}>
+          <Route path="/dash/" element={<DashLayout />}>
+            <Route index element={<Welcome />} />
+            <Route path="users">
+              <Route index element={<UsersList />} />
+              <Route path=":id" element={<EditUser />} />
+              <Route path="newUser" element={<NewUserForm />} />
+            </Route>
+            <Route path="notes">
+              <Route index element={<NotesList />} />
+              <Route path="newNote" element={<NewNoteForm />} />
+              <Route path=":id" element={<EditNote />} />
+            </Route>
           </Route>
         </Route>
         {/* end of dash */}
